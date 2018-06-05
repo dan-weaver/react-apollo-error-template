@@ -1,10 +1,36 @@
 import React, { Component } from "react";
-import { graphql } from "react-apollo";
+import { graphql, compose } from "react-apollo";
 import gql from "graphql-tag";
 
+const personWithPetsWithoutIds = gql`
+  query PersonUnderFetching {
+    people {
+      id
+      name
+      pets {
+        name
+      }
+    }
+  }
+`;
+const personOverview = gql`
+  query PersonOverview {
+    people {
+      id
+      name
+      hobby
+      pets {
+        id
+        name
+      }
+    }
+  }
+`;
 class App extends Component {
   render() {
-    const { data: { loading, people } } = this.props;
+    const {
+      data: { loading, people }
+    } = this.props;
     return (
       <main>
         <header>
@@ -28,21 +54,20 @@ class App extends Component {
           <p>Loading…</p>
         ) : (
           <ul>
-            {people.map(person => <li key={person.id}>{person.name}</li>)}
+            {people.map(person => (
+              <li key={person.id}>
+                {person.name} {person.hobby} {person.pets.length} {"pets"}
+              </li>
+            ))}
           </ul>
         )}
+        <button>Change Budds name to buddy</button>
       </main>
     );
   }
 }
 
-export default graphql(
-  gql`
-    query ErrorTemplate {
-      people {
-        id
-        name
-      }
-    }
-  `
+export default compose(
+  graphql(personWithPetsWithoutIds),
+  graphql(personOverview)
 )(App);

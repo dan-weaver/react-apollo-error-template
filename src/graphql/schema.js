@@ -1,33 +1,34 @@
-import {
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLID,
-  GraphQLString,
-  GraphQLList,
-} from 'graphql';
+import { buildSchema } from "graphql";
 
-const PersonType = new GraphQLObjectType({
-  name: 'Person',
-  fields: {
-    id: { type: GraphQLID },
-    name: { type: GraphQLString },
-  },
-});
+const pets = [{ type: "dog", name: "sparky", id: 1 }];
+
+export const schema = buildSchema(
+  `
+    type Pets {
+      id: ID
+      name: String
+      type:String
+    }
+
+    type Person {
+      id: ID!
+      name: String
+      hobby: String
+      pets: [Pets]
+    }
+
+    type Query {
+      people: [Person]
+    }
+  `
+);
 
 const peopleData = [
-  { id: 1, name: 'John Smith' },
-  { id: 2, name: 'Sara Smith' },
-  { id: 3, name: 'Budd Deey' },
+  { id: 1, name: "John Smith", hobby: "golf", pets: [] },
+  { id: 2, name: "Sara Smith", hobby: "swimming", pets: [] },
+  { id: 3, name: "Bud Deey", hobby: "sailing", pets }
 ];
 
-const QueryType = new GraphQLObjectType({
-  name: 'Query',
-  fields: {
-    people: {
-      type: new GraphQLList(PersonType),
-      resolve: () => peopleData,
-    },
-  },
-});
-
-export const schema = new GraphQLSchema({ query: QueryType });
+export const root = {
+  people: () => peopleData
+};
